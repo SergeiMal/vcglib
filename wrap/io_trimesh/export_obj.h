@@ -172,6 +172,7 @@ public:
     {
       VertexId[vi-m.vert.begin()]=numvert;
       //saves normal per vertex
+#ifndef WEDGNORMAL_MODE
       if (mask & Mask::IOM_WEDGNORMAL )
       {
         if(AddNewNormalVertex(NormalVertex,(*vi).N(),curNormalIndex))
@@ -180,7 +181,9 @@ public:
           curNormalIndex++;
         }
       }
-      if (mask & Mask::IOM_VERTNORMAL ) {
+      else
+#endif
+          if (mask & Mask::IOM_VERTNORMAL ) {
         fprintf(fp,"vn %f %f %f\n",(*vi).N()[0],(*vi).N()[1],(*vi).N()[2]);
       }
       
@@ -213,7 +216,38 @@ public:
     int curTexCoordIndex = 1;
     int curMatIndex = -1;
     std::vector<Material> materialVec; //used if we do not have material attributes 
-    
+
+#ifdef WEDGNORMAL_MODE
+    if ((mask & Mask::IOM_WEDGNORMAL) != 0 && HasPerWedgeNormal(m))
+    {
+        for (ConstFaceIterator fi = m.face.begin(); fi != m.face.end(); ++fi) if (!(*fi).IsD())
+        {
+            for (int j = 0; j < 3/*fi->v.size()*/; ++j)
+            {
+                if (AddNewNormalVertex(NormalVertex, fi->WN(j), curNormalIndex))
+                {
+                    fprintf(fp, "vn %f %f %f\n", fi->WN(j)[0], fi->WN(j)[1], fi->WN(j)[2]);
+                        curNormalIndex++;
+                }
+            }
+        }
+    }
+
+    for (ConstFaceIterator fi = m.face.begin(); fi != m.face.end(); ++fi) if (!(*fi).IsD())
+    {
+        //saves texture coord x wedge
+        if (HasPerWedgeTexCoord(m) && (mask & Mask::IOM_WEDGTEXCOORD))
+            for (int k = 0; k < (*fi).VN(); k++)
+            {
+                if (AddNewTextureCoord(CoordIndexTexture, (*fi).WT(k), curTexCoordIndex))
+                {
+                    fprintf(fp, "vt %f %f\n", (*fi).WT(k).u(), (*fi).WT(k).v());
+                    curTexCoordIndex++; //ncreases the value number to be associated to the Texture
+                }
+            }
+    }
+#endif
+
     for(ConstFaceIterator fi=m.face.begin(); fi!=m.face.end(); ++fi) if( !(*fi).IsD() )
     {
       if((mask & Mask::IOM_FACECOLOR) || (mask & Mask::IOM_WEDGTEXCOORD) || (mask & Mask::IOM_VERTTEXCOORD))
@@ -228,6 +262,7 @@ public:
         }
       }
 
+#ifndef WEDGNORMAL_MODE
       //saves texture coord x wedge
       if(HasPerWedgeTexCoord(m) && (mask & Mask::IOM_WEDGTEXCOORD))
         for(int k=0;k<(*fi).VN();k++)
@@ -238,6 +273,7 @@ public:
               curTexCoordIndex++; //ncreases the value number to be associated to the Texture
             }
         }
+#endif
 
       fprintf(fp,"f ");
       for(int k=0;k<(*fi).VN();k++)
@@ -255,7 +291,7 @@ public:
 
         int vn = -1;
         if(mask & Mask::IOM_WEDGNORMAL )
-          vn = GetIndexVertexNormal(m, NormalVertex, (*fi).V(k)->cN());//index of vertex normal per face.
+          vn = GetIndexVertexNormal(m, NormalVertex, fi->WN(k)/*(*fi).V(k)->cN()*/);//index of vertex normal per face.
         if (mask & Mask::IOM_VERTNORMAL)
           vn = vInd;
 

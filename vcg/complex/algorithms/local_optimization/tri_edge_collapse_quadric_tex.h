@@ -340,7 +340,7 @@ class TriEdgeCollapseQuadricTex: public vcg::tri::TriEdgeCollapse< TriMeshType, 
         {
           qt= QualityFace(*x.F());
           if(qt<MinQual) MinQual=qt;
-          if(pp->NormalCheck){
+          if(pp->NormalCheck && (x.F()->N() != x.F()->N().Zero()) ){
               CoordType nn=TriangleNormal(*x.F()).Normalize();
               ndiff=nn.dot(x.F()->N()) / x.F()->N().Norm();
               if(ndiff<MinCos) MinCos=ndiff;
@@ -352,9 +352,17 @@ class TriEdgeCollapseQuadricTex: public vcg::tri::TriEdgeCollapse< TriMeshType, 
         {
           qt= QualityFace(*x.F());
           if(qt<MinQual) MinQual=qt;
-          if(pp->NormalCheck){
+          if(pp->NormalCheck && (x.F()->N() != x.F()->N().Zero()) ){
               CoordType nn=TriangleNormal(*x.F()).Normalize();
-              ndiff=nn.dot(x.F()->N() / x.F()->N().Norm());
+
+              auto* x_F = x.F();
+              auto x_F_N = x_F->N();
+              auto x_F_N_Norm = x_F_N.Norm();
+              auto div = x_F_N / x_F_N_Norm;
+
+              //ndiff=nn.dot(div/*x.F()->N() / x.F()->N().Norm()*/);
+
+              ndiff = nn.dot(x.F()->N()) / x.F()->N().Norm();
               if(ndiff<MinCos) MinCos=ndiff;
               assert(!math::IsNAN(ndiff));
           }

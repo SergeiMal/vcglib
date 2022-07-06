@@ -939,9 +939,11 @@ public:
     if(bHasPerFaceColor)  oi.mask |= vcg::tri::io::Mask::IOM_FACECOLOR;
     if(bHasPerVertexColor)  oi.mask |= vcg::tri::io::Mask::IOM_VERTCOLOR;
     if (bHasNormals) {
+#ifndef WEDGNORMAL_MODE
       if (oi.numNormals == oi.numVertices)
         oi.mask |= vcg::tri::io::Mask::IOM_VERTNORMAL;
       else
+#endif
         oi.mask |= vcg::tri::io::Mask::IOM_WEDGNORMAL;
     }
     if (oi.numEdges)

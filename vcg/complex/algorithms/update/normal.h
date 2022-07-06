@@ -275,6 +275,8 @@ static void PerVertexNormalized(ComputeMeshType &m)
 /// \brief Equivalent to PerFace() and NormalizePerFace()
 static void PerFaceNormalized(ComputeMeshType &m)
 {
+  //  if (!tri::HasPerFaceNormal(m))
+  //      return;
   PerFace(m);
   NormalizePerFace(m);
 }
@@ -431,7 +433,7 @@ static void PerFaceRW(ComputeMeshType &m, bool normalize=false)
 
     if(normalize)
     {
-        for(f=m.m.face.begin();f!=m.m.face.end();++f)
+        for(f=m.face.begin();f!=m.face.end();++f)
         if( !(*f).IsD() && (*f).IsRW() )
         {
             for(int j=0; j<3; ++j)
@@ -442,7 +444,7 @@ static void PerFaceRW(ComputeMeshType &m, bool normalize=false)
     }
     else
     {
-        for(f=m.m.face.begin();f!=m.m.face.end();++f)
+        for(f=m.face.begin();f!=m.face.end();++f)
             if( !(*f).IsD() && (*f).IsRW() )
             {
                 for(int j=0; j<3; ++j)
