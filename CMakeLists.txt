@@ -67,6 +67,8 @@ set(VCG_HEADERS
 	vcg/complex/algorithms/local_optimization/quad_diag_collapse.h
 	vcg/complex/algorithms/local_optimization/tri_edge_collapse_quadric.h
 	vcg/complex/algorithms/local_optimization/tri_edge_collapse_quadric_tex.h
+	vcg/complex/algorithms/local_optimization/tri_edge_collapse_quadric_tex_tread_safe.h
+        vcg/complex/algorithms/local_optimization/info_standard.h
 	vcg/complex/algorithms/local_optimization/tri_edge_collapse.h
 	vcg/complex/algorithms/local_optimization/tetra_edge_collapse.h
 	vcg/complex/algorithms/polygonal_algorithms.h
