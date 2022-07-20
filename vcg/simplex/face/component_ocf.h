@@ -835,6 +835,16 @@ public:
     faceVec.ReorderFace(newFaceIndex);
   }
 
+
+#ifdef WEDGNORMAL_MODE
+  template < class FaceType>
+  bool FaceVectorHasPerWedgeNormal(const face::vector_ocf<FaceType> &fv)
+  {
+    if(FaceType::HasWedgeNormalOcf()) return fv.IsWedgeNormalEnabled();
+    else return FaceType::HasWedgeNormal();
+  }
+#endif
+
   }
 }// end namespace vcg
 #endif
