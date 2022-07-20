@@ -36,11 +36,9 @@
 #endif
 #include <vcg/space/color4.h>
 
-
 #include <fstream>
 #include <string>
 #include <vector>
-
 
 namespace vcg {
 namespace tri {
@@ -233,7 +231,19 @@ public:
       stream.close();
       return E_CANTOPEN;
     }
-    
+
+    auto correctAbsolutePath = [](std::string& fileName, const std::string objFilePath)
+    {
+        int found = 0;
+        found = fileName.find_last_of("/\\");
+        if (found < 0) // it seems that it isn't absolute path
+        {
+            found = objFilePath.find_last_of("/\\");
+            auto pathToMtl = objFilePath.substr(0, found + 1);
+            fileName = pathToMtl + fileName;
+        }
+    };
+
     typename OpenMeshType::template PerMeshAttributeHandle<std::vector<Material> > materialsHandle =
         vcg::tri::Allocator<OpenMeshType>:: template GetPerMeshAttribute<std::vector<Material> >(m, std::string("materialVector"));
     typename OpenMeshType::template PerFaceAttributeHandle<int> mIndHandle =
@@ -587,9 +597,16 @@ public:
             materialFileName = tokens[1]; //play it safe
           else
             materialFileName = line.substr(7); //get everything after "mtllib "
-          
-          if (!LoadMaterials( materialFileName.c_str(), materials, m.textures))
+
+          correctAbsolutePath(materialFileName, filename);
+
+          if (!LoadMaterials(materialFileName.c_str(), materials, m.textures))
             result = E_MATERIAL_FILE_NOT_FOUND;
+
+          for (auto& texture : m.textures)
+          {
+              correctAbsolutePath(texture, filename);
+          }
         }
         else if ((header.compare("usemtl")==0) && (tokens.size() > 1))	// material usage
         {
@@ -599,7 +616,15 @@ public:
           if ((materials.size() == 1)&&(materials[0].materialName == "")){
             std::string materialFileName(filename);
             materialFileName.replace(materialFileName.end()-4, materialFileName.end(), ".mtl");
+
+            correctAbsolutePath(materialFileName, filename);
+
             LoadMaterials(materialFileName.c_str(), materials, m.textures);
+
+            for (auto& texture : m.textures)
+            {
+                correctAbsolutePath(texture, filename);
+            }
           }
           
           std::string materialName;

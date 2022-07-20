@@ -431,7 +431,9 @@ public:
         fprintf(fp,"newmtl material_%d\n",i);
         fprintf(fp,"Ka %f %f %f\n",materialVec[i].Ka[0],materialVec[i].Ka[1],materialVec[i].Ka[2]);
         fprintf(fp,"Kd %f %f %f\n",materialVec[i].Kd[0],materialVec[i].Kd[1],materialVec[i].Kd[2]);
+#ifndef WEDGNORMAL_MODE
         fprintf(fp,"Ks %f %f %f\n",materialVec[i].Ks[0],materialVec[i].Ks[1],materialVec[i].Ks[2]);
+#endif
         fprintf(fp,"Tr %f\n",materialVec[i].Tr);
         fprintf(fp,"illum %d\n",materialVec[i].illum);
         fprintf(fp,"Ns %f\n",materialVec[i].Ns);
